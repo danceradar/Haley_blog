@@ -1,0 +1,11 @@
+.container.album-wrap
+  - @photos.each_slice(3) do |photos|
+    .row.photo-wrap
+      - photos.each do |photo|
+        - next unless photo.cover
+        .col-lg-4.col-md-4.mx-auto
+          = link_to photo_path(photo), remote: true do
+            .hover.column
+              figure
+                = image_tag photo.cover, class: 'animated swing'
+.album-samples

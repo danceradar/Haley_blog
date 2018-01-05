@@ -1,0 +1,46 @@
+header.home-index-1 {
+  background-image: image-url("bg-1.1.jpeg");
+}
+header.home-index-2 {
+  background-image: image-url("bg-1.2.jpeg");
+}
+header.articles-index {
+  background-image: image-url("bg-3.jpeg");
+}
+header.articles-show-1 {
+  background-image: image-url("bg-2.1.jpeg");
+}
+header.articles-show-2 {
+  background-image: image-url("bg-2.2.jpeg");
+}
+header.home-about {
+  background-image: image-url("bg-5.jpeg");
+}
+header.home-timeline {
+  background-image: image-url("bg-6.png");
+}
+.content-markdown {
+  word-wrap: break-word;
+  img {
+    width: 100%;
+  }
+  a {
+    color: #0366d6;
+    text-decoration: none;
+  }
+  blockquote {
+    padding: 0 1em;
+    color: #6a737d;
+    border-left: 0.25em solid #dfe2e5;
+  }
+  h1, h2, h3, h4 {
+    margin-bottom: 20px;
+    padding-bottom: 0.3em;
+    font-size: 1.5em;
+    border-bottom: 1px solid #eaecef;
+  }
+}
+body.front_end {
+  background: #f9f9f0;
+}
+

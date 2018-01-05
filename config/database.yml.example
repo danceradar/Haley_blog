@@ -1,0 +1,26 @@
+development:
+  adapter:  mysql2
+  encoding: utf8
+  host:     localhost
+  database: RBlog_development
+  pool:     5
+  username: root
+  password: 1234
+
+test:
+  adapter:  mysql2
+  encoding: utf8
+  host:     localhost
+  database: RBlog_test
+  pool:     5
+  username: root
+  password: 1234
+
+production:
+  adapter:  mysql2
+  encoding: utf8
+  host:     localhost
+  database: RBlog_production
+  pool:     50
+  username: root
+  password: 1234
