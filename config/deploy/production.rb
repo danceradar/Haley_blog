@@ -1,5 +1,5 @@
-set :domain, 'liuzhen.me'
-set :deploy_to, '/home/ruby/RBlog'
-set :repository,  'https://github.com/liuzhenangel/RBlog.git'
+set :domain, 'haleyme.com'
+set :deploy_to, '/www/Haley_blog'
+set :repository,  'https://github.com/babyhai/Haley_blog.git'
 set :branch, 'master'
 set :user, 'ruby'

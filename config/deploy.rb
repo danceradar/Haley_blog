@@ -1,91 +1,53 @@
-set :stages, %w(production)
-set :default_stage, 'production'
-
 require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
-require 'mina/rvm'
+require 'mina/rbenv'  
 require 'mina/puma'
-require "mina_sidekiq/tasks"
-require 'mina/logs'
-require 'mina/multistage'
 
-set :shared_dirs, fetch(:shared_dirs, []).push('log', 'public/uploads', 'node_modules')
-set :shared_files, fetch(:shared_files, []).push('config/database.yml', 'config/application.yml')
+set :domain, 'haleyme.com'
+set :deploy_to, '/www/Haley_blog'
+set :repository, ''
+set :branch, 'master'
 
-set :puma_config, ->{ "#{fetch(:current_path)}/config/puma.rb" }
-set :sidekiq_pid, ->{ "#{fetch(:shared_path)}/tmp/pids/sidekiq.pid" }
+set :shared_paths, ['config/database.yml','config/local_env.yml','config/secrets.yml', 'log'] 
+set :stage, 'production'
 
-task :remote_environment do
-  invoke :'rvm:use', '2.3.1'
+
+task :environment do
+        #'rvm:use[ruby-2.0.0-p353@rails]'
+  invoke :'rbenv:global[2.4.3]'
 end
 
-task :setup do
-  command %[mkdir -p "#{fetch(:shared_path)}/tmp/sockets"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/tmp/sockets"]
 
-  command %[mkdir -p "#{fetch(:shared_path)}/tmp/pids"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/tmp/pids"]
+task :setup => :environment do
+  queue! %[mkdir -p "/www/Haley_blog/shared/log"]
+  queue! %[chmod g+rx,u+rwx "/www/Haley_blog/shared/log"]
 
-  command %[mkdir -p "#{fetch(:shared_path)}/log"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/log"]
+  queue! %[mkdir -p "/www/Haley_blog/shared/config"]
+  queue! %[chmod g+rx,u+rwx "/www/Haley_blog/shared/config"]
 
-  command %[mkdir -p "#{fetch(:shared_path)}/public/uploads"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/public/uploads"]
+  queue! %[mkdir -p "/www/Haley_blog/shared/tmp/pids"]
+  queue! %[chmod g+rx,u+rwx "/www/Haley_blog/shared/tmp"]
+  queue! %[chmod g+rx,u+rwx "/www/Haley_blog/shared/tmp/pids"]
 
-  command %[mkdir -p "#{fetch(:shared_path)}/node_modules"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/node_modules"]
-
-  command %[mkdir -p "#{fetch(:shared_path)}/config"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/config"]
-
-  command %[touch "#{fetch(:shared_path)}/config/application.yml"]
-  command %[echo "-----> Be sure to edit '#{fetch(:shared_path)}/config/application.yml'"]
-
-  command %[touch "#{fetch(:shared_path)}/config/database.yml"]
-  command %[echo "-----> Be sure to edit '#{fetch(:shared_path)}/config/database.yml'"]
+  queue! %[mkdir -p "/www/Haley_blog/shared/tmp/sockets"]
+  queue! %[chmod g+rx,u+rwx "/www/Haley_blog/shared/tmp/sockets"]
 end
 
 desc "Deploys the current version to the server."
-task :deploy do
-  command %[echo "-----> Server: #{fetch(:domain)}"]
-  command %[echo "-----> Path: #{fetch(:deploy_to)}"]
-  command %[echo "-----> Branch: #{fetch(:branch)}"]
-
+task :deploy => :environment do
   deploy do
-    invoke :'sidekiq:quiet'
+    # Put things that will set up an empty directory into a fully set-up
+    # instance of your project.
     invoke :'git:clone'
     invoke :'deploy:link_shared_paths'
     invoke :'bundle:install'
-    invoke :'rails:db_migrate'
+    invoke :'rake:db:migrate' # 如果是mongoid的话，可以注释掉
     invoke :'rails:assets_precompile'
-    invoke :'deploy:cleanup'
+    
 
-    on :launch do
-      invoke :'rvm:use', '2.3.1'
-      invoke :'puma:hard_restart'
-      invoke :'sidekiq:restart'
-    end
-  end
-end
-
-desc "Deploys the current version to the server."
-task :first_deploy do
-  command %[echo "-----> Server: #{fetch(:domain)}"]
-  command %[echo "-----> Path: #{fetch(:deploy_to)}"]
-  command %[echo "-----> Branch: #{fetch(:branch)}"]
-
-  deploy do
-    invoke :'git:clone'
-    invoke :'deploy:link_shared_paths'
-    invoke :'bundle:install'
-    invoke :'rails:assets_precompile'
-    invoke :'deploy:cleanup'
-
-    on :launch do
-      invoke :'rvm:use', '2.3.1'
-      invoke :'rails:db_create'
-      invoke :'rails:db_migrate'
+    to :launch do
+      queue "touch  /www/Haley_blog/tmp/restart.txt"
     end
   end
 end

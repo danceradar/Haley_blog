@@ -4,7 +4,7 @@ if ENV['RAILS_ENV'] == 'production'
   state_path "/www/Haley_blog/shared/tmp/pids/puma.state"
   bind "unix:///www/Haley_blog/shared/tmp/sockets/puma.sock"
   activate_control_app "unix:///www/Haley_blog/shared/tmp/sockets/pumactl.sock"
-#  daemonize true
+  daemonize true
   workers 2
   threads 8, 16
   preload_app!
